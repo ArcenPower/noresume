@@ -22,6 +22,7 @@
             max-width: 500px;
             width: 100%;
             text-align: center;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.15);
         }
         .loading { color: #666; }
         .profile-img {
@@ -35,6 +36,27 @@
             justify-content: center;
             font-size: 36px;
             color: white;
+            font-weight: bold;
+        }
+        .subtitle {
+            color: #666;
+            font-size: 16px;
+            margin-bottom: 30px;
+        }
+        .badges {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 30px;
+        }
+        .badge {
+            background: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            margin: 5px;
+            display: inline-block;
+            font-size: 14px;
+            border: 2px solid #e0e0e0;
         }
         .code-box {
             background: #fff3cd;
@@ -49,7 +71,126 @@
             color: #333;
             letter-spacing: 2px;
         }
+        .code-hint {
+            color: #856404;
+            font-size: 14px;
+            margin-top: 10px;
+        }
+        .bonus-box {
+            background: #d4edda;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 30px;
+        }
+        .bonus-amount {
+            font-size: 32px;
+            font-weight: bold;
+            color: #155724;
+        }
+        .bonus-text {
+            color: #155724;
+            font-size: 14px;
+            margin-top: 5px;
+        }
+        .cta-button {
+            background: linear-gradient(135deg, #4ABB77 0%, #06E961 100%);
+            color: white;
+            padding: 18px 40px;
+            border-radius: 30px;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 15px rgba(74, 187, 119, 0.4);
+            transition: transform 0.2s ease;
+        }
+        .cta-button:hover {
+            transform: translateY(-2px);
+        }
+        .app-links {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin: 20px 0;
+            flex-wrap: wrap;
+        }
+        .app-link {
+            display: block;
+            transition: transform 0.2s ease;
+        }
+        .app-link:hover {
+            transform: scale(1.05);
+        }
+        .app-button {
+            background: black;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            min-width: 140px;
+            height: 50px;
+            text-decoration: none;
+        }
+        .google-play {
+            background: linear-gradient(135deg, #48CAE4 0%, #023E8A 100%);
+        }
+        .app-icon {
+            font-size: 24px;
+            line-height: 1;
+        }
+        .app-text {
+            text-align: left;
+            line-height: 1.2;
+        }
+        .app-small {
+            font-size: 10px;
+            opacity: 0.8;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .app-big {
+            font-size: 16px;
+            font-weight: bold;
+        }
+        .steps {
+            text-align: left;
+            margin-top: 30px;
+            padding-top: 30px;
+            border-top: 1px solid #e0e0e0;
+        }
+        .step {
+            margin-bottom: 15px;
+            padding-left: 30px;
+            position: relative;
+            color: #333;
+        }
+        .step:before {
+            content: '✓';
+            position: absolute;
+            left: 0;
+            color: #4ABB77;
+            font-weight: bold;
+            font-size: 16px;
+        }
         .hidden { display: none; }
+        
+        /* Error styles */
+        .error-container h1 {
+            color: #dc3545;
+            margin-bottom: 15px;
+        }
+        .error-link {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px 30px;
+            border-radius: 30px;
+            text-decoration: none;
+            display: inline-block;
+            font-weight: bold;
+        }
     </style>
 </head>
 <body>
@@ -65,23 +206,73 @@
             
             <div class="code-box">
                 <div class="code" id="referralCode">...</div>
-                <div style="color: #856404; font-size: 14px; margin-top: 10px;">📸 Screenshot this code!</div>
+                <div class="code-hint">📸 Screenshot this code!</div>
             </div>
             
-            <div style="background: #d4edda; border-radius: 12px; padding: 20px; margin-bottom: 30px;">
-                <div style="font-size: 32px; font-weight: bold; color: #155724;">£25 Bonus</div>
-                <div style="color: #155724; font-size: 14px; margin-top: 5px;">After your first 40 hours completed!</div>
+            <div class="bonus-box">
+                <div class="bonus-amount">£25 Bonus</div>
+                <div class="bonus-text">After your first 40 hours completed!</div>
             </div>
             
-            <a href="https://apps.apple.com/app/noresume" style="background: linear-gradient(135deg, #4ABB77 0%, #06E961 100%); color: white; padding: 18px 40px; border-radius: 30px; text-decoration: none; display: inline-block; font-size: 18px; font-weight: bold;">
+            <a href="#" class="cta-button" id="mainCTA">
                 Download App & Start Earning
             </a>
+            
+            <div class="app-links">
+                <a href="https://apps.apple.com/app/noresume" class="app-link">
+                    <div class="app-button app-store">
+                        <div class="app-icon">🍎</div>
+                        <div class="app-text">
+                            <div class="app-small">Download on the</div>
+                            <div class="app-big">App Store</div>
+                        </div>
+                    </div>
+                </a>
+                <a href="https://play.google.com/store/apps/details?id=com.noresume" class="app-link">
+                    <div class="app-button google-play">
+                        <div class="app-icon">▶</div>
+                        <div class="app-text">
+                            <div class="app-small">GET IT ON</div>
+                            <div class="app-big">Google Play</div>
+                        </div>
+                    </div>
+                </a>
+            </div>
+            
+            <p style="color: #666; font-size: 14px; margin-top: 20px;">
+                You can enter the referral code in the app later and still get all rewards!
+            </p>
+            
+            <div class="steps">
+                <h3 style="margin-bottom: 20px; color: #333;">How it works:</h3>
+                <div class="step">Download the NoResume app</div>
+                <div class="step">Sign up as a worker</div>
+                <div class="step">Enter your referral code</div>
+                <div class="step">Complete your first 40 hours</div>
+                <div class="step">Get £25 bonus instantly!</div>
+            </div>
         </div>
         
-        <div id="error" class="hidden">
+        <div id="error" class="hidden error-container">
             <h1>Invalid Referral Code</h1>
             <p style="color: #666; margin: 20px 0;">The code doesn't exist or has expired.</p>
-            <a href="https://noresume.co" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 15px 30px; border-radius: 30px; text-decoration: none; display: inline-block;">Visit NoResume</a>
+            
+            <a href="#" class="cta-button" id="errorCTA">
+                Download App Anyway
+            </a>
+            
+            <div class="app-links">
+                <a href="https://apps.apple.com/app/noresume" class="app-link">
+                    <img src="https://tools.applemediaservices.com/api/badges/download-on-the-app-store/black/en-us?size=250x83" alt="Download on the App Store">
+                </a>
+                <a href="https://play.google.com/store/apps/details?id=com.noresume" class="app-link">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/7/78/Google_Play_Store_badge_EN.svg" alt="Get it on Google Play">
+                </a>
+            </div>
+            
+            <p style="color: #666; font-size: 14px; margin-top: 20px;">
+                Don't worry! You can enter the referral code in the app later and still get all rewards.
+            </p>
         </div>
     </div>
 
@@ -111,10 +302,23 @@
                 document.getElementById('title').textContent = `${data.referrerName} invited you!`;
                 document.getElementById('profileImg').textContent = data.referrerName.charAt(0).toUpperCase();
                 
+                // Update the main CTA button to be smart
+                updateCTAButton();
+                
                 // Add badges if any
                 if (data.badges && data.badges.length > 0) {
-                    const badgesHtml = data.badges.map(b => `<span style="background: white; padding: 8px 16px; border-radius: 20px; margin: 5px; display: inline-block;">${b}</span>`).join('');
-                    document.getElementById('badges').innerHTML = `<div style="background: #f8f9fa; border-radius: 12px; padding: 20px; margin-bottom: 30px;">${badgesHtml}</div>`;
+                    const badgesContainer = document.getElementById('badges');
+                    const badgesHtml = data.badges.map(badge => 
+                        `<span class="badge">${badge}</span>`
+                    ).join('');
+                    badgesContainer.innerHTML = `
+                        <div class="badges">
+                            <div style="font-size: 12px; color: #666; margin-bottom: 10px;">
+                                ${data.referrerName}'s Achievements
+                            </div>
+                            ${badgesHtml}
+                        </div>
+                    `;
                 }
                 
                 // Show content, hide loading
@@ -124,6 +328,37 @@
             } catch (error) {
                 console.error('Error:', error);
                 showError();
+            }
+        }
+        
+        function updateCTAButton() {
+            const mainCTA = document.getElementById('mainCTA');
+            const errorCTA = document.getElementById('errorCTA');
+            const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+            const isAndroid = /Android/.test(navigator.userAgent);
+            
+            // Update main CTA
+            if (isIOS) {
+                mainCTA.href = 'https://apps.apple.com/app/noresume';
+                mainCTA.textContent = 'Download on App Store';
+            } else if (isAndroid) {
+                mainCTA.href = 'https://play.google.com/store/apps/details?id=com.noresume';
+                mainCTA.textContent = 'Get it on Google Play';
+            } else {
+                mainCTA.href = 'https://apps.apple.com/app/noresume';
+                mainCTA.textContent = 'Download App & Start Earning';
+            }
+            
+            // Update error CTA too
+            if (isIOS) {
+                errorCTA.href = 'https://apps.apple.com/app/noresume';
+                errorCTA.textContent = 'Download on App Store';
+            } else if (isAndroid) {
+                errorCTA.href = 'https://play.google.com/store/apps/details?id=com.noresume';
+                errorCTA.textContent = 'Get it on Google Play';
+            } else {
+                errorCTA.href = 'https://apps.apple.com/app/noresume';
+                errorCTA.textContent = 'Download App Anyway';
             }
         }
         
