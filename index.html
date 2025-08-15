@@ -219,10 +219,10 @@
             </a>
             
             <div class="app-links">
-                <a href="https://apps.apple.com/app/noresume" class="app-link">
+                <a href="https://apps.apple.com/app/noresume" class="app-link" data-platform="ios">
                     <img src="https://tools.applemediaservices.com/api/badges/download-on-the-app-store/black/en-us?size=250x83" alt="Download on the App Store">
                 </a>
-                <a href="https://play.google.com/store/apps/details?id=com.noresume" class="app-link">
+                <a href="https://play.google.com/store/apps/details?id=com.noresume" class="app-link" data-platform="android">
                     <img src="https://upload.wikimedia.org/wikipedia/commons/7/78/Google_Play_Store_badge_EN.svg" alt="Get it on Google Play">
                 </a>
             </div>
@@ -250,10 +250,10 @@
             </a>
             
             <div class="app-links">
-                <a href="https://apps.apple.com/app/noresume" class="app-link">
+                <a href="https://apps.apple.com/app/noresume" class="app-link" data-platform="ios">
                     <img src="https://tools.applemediaservices.com/api/badges/download-on-the-app-store/black/en-us?size=250x83" alt="Download on the App Store">
                 </a>
-                <a href="https://play.google.com/store/apps/details?id=com.noresume" class="app-link">
+                <a href="https://play.google.com/store/apps/details?id=com.noresume" class="app-link" data-platform="android">
                     <img src="https://upload.wikimedia.org/wikipedia/commons/7/78/Google_Play_Store_badge_EN.svg" alt="Get it on Google Play">
                 </a>
             </div>
@@ -265,26 +265,41 @@
     </div>
 
     <script>
+        // Global variables for tracking
+        let pageLoadTime = Date.now();
+        let code = '';
+        let trackingId = '';
+        let source = '';
+        let hasTrackedReturn = false;
+        
         async function loadReferralData() {
             // Get code from URL
             const pathParts = window.location.pathname.split('/');
-            const code = pathParts[pathParts.length - 1];
+            code = pathParts[pathParts.length - 1];
             
             // Get tracking parameters from URL
             const urlParams = new URLSearchParams(window.location.search);
-            const source = urlParams.get('s');
-            const trackingId = urlParams.get('t');
+            source = urlParams.get('s');
+            trackingId = urlParams.get('t');
             
-            // Store tracking info for later use (when user signs up in app)
-            if (source) {
-                localStorage.setItem('referral_source', source);
+            // Check if return visitor
+            const lastVisit = localStorage.getItem('last_visit_' + code);
+            if (lastVisit && !hasTrackedReturn) {
+                hasTrackedReturn = true;
+                trackEvent('return_visit', {
+                    last_visit: lastVisit,
+                    time_since_last: Date.now() - new Date(lastVisit).getTime()
+                });
             }
-            if (trackingId) {
-                localStorage.setItem('referral_tracking_id', trackingId);
-            }
-            if (code) {
-                localStorage.setItem('referral_code', code);
-            }
+            localStorage.setItem('last_visit_' + code, new Date().toISOString());
+            
+            // Store tracking info for app
+            if (source) localStorage.setItem('referral_source', source);
+            if (trackingId) localStorage.setItem('referral_tracking_id', trackingId);
+            if (code) localStorage.setItem('referral_code', code);
+            
+            // Track device info
+            trackDeviceInfo();
             
             if (!code) {
                 showError();
@@ -330,12 +345,84 @@
                 document.getElementById('loading').classList.add('hidden');
                 document.getElementById('content').classList.remove('hidden');
                 
-                
             } catch (error) {
                 console.error('Error:', error);
                 showError();
             }
         }
+        
+        // Track any event
+        async function trackEvent(eventType, eventData = {}) {
+            try {
+                await fetch('https://fbiaqgiccgkstsewihxz.supabase.co/functions/v1/track-referral-event', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        code: code,
+                        event_type: eventType,
+                        event_data: eventData,
+                        tracking_id: trackingId
+                    })
+                });
+            } catch (error) {
+                // Silent fail - don't disrupt user experience
+            }
+        }
+        
+        // Track device information
+        function trackDeviceInfo() {
+            const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+            const isTablet = /iPad|Android/i.test(navigator.userAgent) && !(/Mobile/i.test(navigator.userAgent));
+            const deviceType = isTablet ? 'tablet' : (isMobile ? 'mobile' : 'desktop');
+            
+            // Get browser info
+            let browser = 'unknown';
+            if (navigator.userAgent.indexOf('Chrome') > -1) browser = 'Chrome';
+            else if (navigator.userAgent.indexOf('Safari') > -1) browser = 'Safari';
+            else if (navigator.userAgent.indexOf('Firefox') > -1) browser = 'Firefox';
+            
+            // Get OS
+            let os = 'unknown';
+            if (navigator.userAgent.indexOf('Win') > -1) os = 'Windows';
+            else if (navigator.userAgent.indexOf('Mac') > -1) os = 'MacOS';
+            else if (navigator.userAgent.indexOf('Linux') > -1) os = 'Linux';
+            else if (navigator.userAgent.indexOf('Android') > -1) os = 'Android';
+            else if (navigator.userAgent.indexOf('iOS') > -1) os = 'iOS';
+            
+            trackEvent('device_info', {
+                device_type: deviceType,
+                browser: browser,
+                os: os,
+                screen_width: window.screen.width,
+                screen_height: window.screen.height
+            });
+        }
+        
+        // Track download intent
+        function trackDownload(platform) {
+            trackEvent('download_intent', {
+                platform: platform,
+                time_on_page: Math.round((Date.now() - pageLoadTime) / 1000)
+            });
+        }
+        
+        // Track page time when leaving
+        window.addEventListener('beforeunload', function() {
+            const timeOnPage = Math.round((Date.now() - pageLoadTime) / 1000);
+            // Use sendBeacon for reliability
+            if (navigator.sendBeacon) {
+                const data = JSON.stringify({
+                    code: code,
+                    event_type: 'page_time',
+                    event_data: { seconds: timeOnPage },
+                    tracking_id: trackingId
+                });
+                navigator.sendBeacon('https://fbiaqgiccgkstsewihxz.supabase.co/functions/v1/track-referral-event', 
+                    new Blob([data], { type: 'application/json' }));
+            }
+        });
         
         function updateCTAButton() {
             const mainCTA = document.getElementById('mainCTA');
@@ -343,30 +430,47 @@
             const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
             const isAndroid = /Android/.test(navigator.userAgent);
             
-            // Update main CTA
+            // Update main CTA with tracking
             if (isIOS) {
                 mainCTA.href = 'https://apps.apple.com/app/noresume';
                 mainCTA.textContent = 'Download on App Store';
+                mainCTA.onclick = () => trackDownload('ios');
             } else if (isAndroid) {
                 mainCTA.href = 'https://play.google.com/store/apps/details?id=com.noresume';
                 mainCTA.textContent = 'Get it on Google Play';
+                mainCTA.onclick = () => trackDownload('android');
             } else {
                 mainCTA.href = 'https://apps.apple.com/app/noresume';
                 mainCTA.textContent = 'Download App & Start Earning';
+                mainCTA.onclick = () => trackDownload('desktop-to-ios');
             }
             
             // Update error CTA too
             if (isIOS) {
                 errorCTA.href = 'https://apps.apple.com/app/noresume';
                 errorCTA.textContent = 'Download on App Store';
+                errorCTA.onclick = () => trackDownload('ios-error');
             } else if (isAndroid) {
                 errorCTA.href = 'https://play.google.com/store/apps/details?id=com.noresume';
                 errorCTA.textContent = 'Get it on Google Play';
+                errorCTA.onclick = () => trackDownload('android-error');
             } else {
                 errorCTA.href = 'https://apps.apple.com/app/noresume';
                 errorCTA.textContent = 'Download App Anyway';
+                errorCTA.onclick = () => trackDownload('desktop-to-ios-error');
             }
         }
+        
+        // Track app store image clicks
+        document.addEventListener('DOMContentLoaded', function() {
+            const appLinks = document.querySelectorAll('.app-link');
+            appLinks.forEach(link => {
+                link.addEventListener('click', function(e) {
+                    const platform = this.getAttribute('data-platform');
+                    trackDownload(platform + '-badge');
+                });
+            });
+        });
         
         function showError() {
             document.getElementById('loading').classList.add('hidden');
