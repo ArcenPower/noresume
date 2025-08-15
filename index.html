@@ -330,8 +330,6 @@
                 document.getElementById('loading').classList.add('hidden');
                 document.getElementById('content').classList.remove('hidden');
                 
-                // Log tracking info for debugging (remove in production)
-                console.log('Tracking info:', { source, trackingId, code });
                 
             } catch (error) {
                 console.error('Error:', error);
